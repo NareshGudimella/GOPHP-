@@ -1,0 +1,12 @@
+{
+    "name": "google/login",
+    "description": "google login for ci4",
+    "autoload": {
+        "psr-4": {
+            "Google\\Login\\": "src/"
+        }
+    },
+    "require": {
+        "google/apiclient": "2.0"
+    }
+}

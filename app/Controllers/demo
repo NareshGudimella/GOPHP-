@@ -1,0 +1,73 @@
+ if($this->request->is("post")){
+        $rules=[
+          'email'=>'required|valid_email|',
+          'pwd'=>'required|min_length[6]|max_length[16]',
+        ];
+      if( $this->validate($rules)) {
+        $email=$this->request->getVar('email');
+        $password=$this->request->getVar('pwd');
+       $userdata= $this->loginmodel ->verfyEmail($email);
+           if($userdata){
+                  if(password_verify($password,$userdata['password'])){
+                                    if($userdata['status']=='active' ){
+                                             $logininfo=[
+                                              'uniid'=>$userdata['uniid'],
+                                              'agent'=>$this->getuseragentinfo(),
+                                              'ip'=>$this->request->getIPAddress(),
+                                              'login'=>date('y-m-d h:i:s')
+
+                                             ];
+                                             $la_id =$this->loginmodel->savelogininfo($logininfo);
+                                             if($la_id){
+                                              echo $la_id;
+                                              $this->session->set('logged_info',$la_id);
+                                             }
+                                             else{
+                                              echo 'noid';
+                                             }
+                                            
+                                            $this ->session->set('logged_user',$userdata['uniid']);
+                                            return redirect()->to(base_url().'dashboard');
+                      
+                                    }else{
+                                      $this->session->setTempdata('error','Please Activate you account . contact Admin',3);
+                                      return redirect()->to(current_url());
+                  
+                                    }
+                   }else{
+                    $this->session->setTempdata('error','Sorry! U Entered Wrong Password',3);
+                    return redirect()->to(current_url());
+
+                   }
+                  
+           }else{
+            $this ->session->setTempdata('error','Sorry! Email does not Exists ',3);
+            return redirect()->to(current_url());
+           }
+                                        
+      }else{
+        $data['validation']= $this->validator;
+      }
+      }
+
+
+
+
+
+
+
+
+
+       if(password_verify($opwd,$data['password'])){
+                               $status= $this->dmodel->updatepassword($npwd,$uniid);
+                               if($status){
+                                    session()->setTempdata('success','password Updated',3);
+                                    return redirect()->to(current_url());
+                               }else{
+                                session()->setTempdata('error','Sorry! Unable to Update your password ,try again',3);
+                                return redirect()->to(current_url());
+                               }
+
+                        }else{
+                            session()->setTempdata('error','Old password doesnot match with db',3);
+                        }
